@@ -1,3 +1,5 @@
 {
-  "creators": []
+  "creators": [
+    { "slug": "test", "code": "TESTPAL", "active": true }
+  ]
 }
