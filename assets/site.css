@@ -239,7 +239,8 @@ footer a:hover { color: var(--ink); }
 .lang { display: flex; gap: 2px; margin-left: 8px; padding: 3px; border-radius: 999px; background: var(--surface-2); font-weight: 800; font-size: 12.5px; }
 .lang a { padding: 6px 10px; border-radius: 999px; text-decoration: none; color: var(--ink-muted); }
 .lang a.on { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-card); }
-@media (max-width: 760px) { .lang { display: none; } }
+@media (max-width: 760px) { .lang { margin-left: auto; } .top .btn.sm { margin-left: 8px !important; padding: 0 14px; } }
+@media (max-width: 380px) { .top .btn.sm { display: none; } }
 
 /* official-style store badges */
 .badge { display: inline-flex; align-items: center; gap: 10px; height: 56px; padding: 0 20px 0 16px; border-radius: 12px; background: #000; color: #fff; text-decoration: none; border: 1px solid #a6a6a6; }
@@ -349,3 +350,5 @@ footer a:hover { color: var(--ink); }
 .sbadge { display: inline-block; line-height: 0; transition: transform .15s ease; }
 .sbadge:hover { transform: translateY(-2px); }
 .sbadge img { height: 56px; width: auto; }
+
+.top .btn.sm { white-space: nowrap; }
