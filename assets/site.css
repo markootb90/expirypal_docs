@@ -280,7 +280,7 @@ footer a:hover { color: var(--ink); }
 .compare td.me { background: color-mix(in srgb, var(--brand-soft) 45%, transparent); }
 .compare td:first-child, .compare th:first-child { text-align: left; font-weight: 700; }
 .compare tr:last-child td { border-bottom: 0; }
-.y { color: var(--brand); } .n { color: var(--ink-faint); } .half { color: var(--soon); font-weight: 700; font-size: 13px; }
+.compare .y { color: var(--brand); } .compare .n { color: var(--ink-faint); } .half { color: var(--soon); font-weight: 700; font-size: 13px; }
 @media (max-width: 640px) { .compare th, .compare td { padding: 12px 8px; font-size: 13px; } }
 
 /* video */
