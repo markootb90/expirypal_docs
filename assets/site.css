@@ -353,3 +353,12 @@ footer a:hover { color: var(--ink); }
 .sbadge img { height: 56px; width: auto; }
 
 .top .btn.sm { white-space: nowrap; }
+
+/* Pricing opens with the app icon: Pro is the same app, not a separate brand. */
+.pmark { display: block; width: 64px; height: 64px; border-radius: 15px; margin: 0 auto 14px; box-shadow: var(--shadow-card); }
+/* Help and creator code, as two small lines under the final download buttons. */
+.cta-more { max-width: 560px; margin: 28px auto 0; padding-top: 22px; border-top: 1px solid var(--line); display: grid; gap: 10px; text-align: center; }
+.cta-more p { color: var(--ink-muted); font-size: 14.5px; line-height: 1.5; }
+.cta-more b { color: var(--ink); font-weight: 800; }
+.cta-more a { font-weight: 800; }
+.maker p a { font-weight: 800; }
