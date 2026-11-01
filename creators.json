@@ -1,5 +1,6 @@
 {
   "creators": [
-    { "slug": "ela", "code": "ELA", "active": true }
+    { "slug": "ela", "code": "ELA", "active": true },
+    { "slug": "marko", "code": "MARKO", "active": true }
   ]
 }
