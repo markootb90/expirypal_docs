@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="/assets/site.css?v=7">
   <meta name="robots" content="noindex">
 </head>
-<body><header class="top"><div class="wrap"><a class="brand" href="/"><img src="/assets/icon-green.png" alt="">ExpiryPal</a><nav class="nav"><a href="/#how">How it works</a><a href="/#pricing">Pricing</a><a href="/#get">Support</a></nav><a class="btn sm" href="/#get">Get the app</a></div></header><main class="page"><div class="doc center-card"><img class="logo" src="/assets/icon-green.png" alt=""><h1>Get ExpiryPal</h1><p>Waste less. Save more. ExpiryPal reminds you before things run out.</p><p id="code-line" class="codebox" hidden>Your creator code<b id="code"></b><span>Enter it when you first open ExpiryPal, or later in Settings &gt; Creator code, and get 30 days of Pro instead of 14.</span></p><div class="stores"><a class="sbadge" id="app-store" href="https://apps.apple.com/app/id6821722011"><img src="/assets/badge-app-store.svg" alt="Download on the App Store" width="168" height="56"></a><a class="sbadge" id="play-store" href="https://play.google.com/store/apps/details?id=com.expirypal.app"><img src="/assets/badge-google-play.png" alt="Get it on Google Play" width="188" height="56"></a></div></div></main><footer><div class="wrap"><span>© 2026 ExpiryPal</span><div class="links"><a href="/privacy.html">Privacy</a><a href="mailto:expirypal.app@gmail.com">Contact</a></div></div></footer>
+<body><header class="top"><div class="wrap"><a class="brand" href="/"><img src="/assets/icon-green.png" alt="">ExpiryPal</a><nav class="nav"><a href="/#how">How it works</a><a href="/#pricing">Pricing</a><a href="/#get">Support</a></nav><a class="btn sm" href="/#get">Get the app</a></div></header><main class="page"><div class="doc center-card"><img class="logo" src="/assets/icon-green.png" alt=""><h1>Get ExpiryPal</h1><p>Waste less. Save more. ExpiryPal reminds you before things run out.</p><p id="code-line" class="codebox" hidden><span id="code-label">Your promo code</span><b id="code"></b><span id="code-hint">Paste it when you first open ExpiryPal and get 30 days of Pro instead of 14.</span></p><p id="copy-wrap" hidden><a class="btn" id="copy-go" href="https://apps.apple.com/app/id6821722011">Copy code and open App Store</a></p><div class="stores"><a class="sbadge" id="app-store" href="https://apps.apple.com/app/id6821722011"><img src="/assets/badge-app-store.svg" alt="Download on the App Store" width="168" height="56"></a><a class="sbadge" id="play-store" href="https://play.google.com/store/apps/details?id=com.expirypal.app"><img src="/assets/badge-google-play.png" alt="Get it on Google Play" width="188" height="56"></a></div></div></main><footer><div class="wrap"><span>© 2026 ExpiryPal</span><div class="links"><a href="/privacy.html">Privacy</a><a href="mailto:expirypal.app@gmail.com">Contact</a></div></div></footer>
   <script>
     (function () {
       // App Store Connect > App Analytics > Campaigns > Generate a campaign link shows the provider token ("pt").
@@ -57,14 +57,72 @@
         document.getElementById('app-store').href = ios;
         document.getElementById('play-store').href = android;
         if (creator && creator.code) {
-          document.getElementById('code').textContent = creator.code;
+          var code = creator.code;
+          document.getElementById('code').textContent = code;
+          document.getElementById('code-label').textContent = T.label;
+          document.getElementById('code-hint').textContent = T.hint;
           document.getElementById('code-line').hidden = false;
+          // Any store tap copies the code, so the app can offer "Paste" on first launch.
+          document.getElementById('app-store').addEventListener('click', function (e) { copyThenGo(e, code, ios); });
+          document.getElementById('play-store').addEventListener('click', function (e) { copyThenGo(e, code, android); });
+          if (isIOS) {
+            // iPhone has no install referrer, so the clipboard carries the code. Copying needs a tap, so stay on the page.
+            var go = document.getElementById('copy-go');
+            go.href = ios;
+            go.textContent = T.button;
+            go.addEventListener('click', function (e) { copyThenGo(e, code, ios); });
+            document.getElementById('copy-wrap').hidden = false;
+            return;
+          }
         }
         if (isIOS) {
           window.location.replace(ios);
         } else if (isAndroid) {
           window.location.replace(android);
         }
+      }
+
+      var lang = (navigator.language || 'en').slice(0, 2).toLowerCase();
+      var T = {
+        en: { title: 'Get ExpiryPal', sub: 'Waste less. Save more. ExpiryPal reminds you before things run out.', label: 'Your promo code', hint: 'Paste it when you first open ExpiryPal and get 30 days of Pro instead of 14.', button: 'Copy code and open App Store', copied: 'Code copied' },
+        sr: { title: 'Preuzmi ExpiryPal', sub: 'Manje bacaj. Više uštedi. ExpiryPal te podseti pre nego što nešto istekne.', label: 'Tvoj promo kod', hint: 'Nalepi ga kad prvi put otvoriš ExpiryPal i dobij 30 dana Pro-a umesto 14.', button: 'Kopiraj kod i otvori App Store', copied: 'Kod je kopiran' },
+        ru: { title: 'Скачать ExpiryPal', sub: 'Меньше выбрасывай. Больше экономь. ExpiryPal напомнит, пока срок не истёк.', label: 'Ваш промокод', hint: 'Вставьте его при первом запуске ExpiryPal и получите 30 дней Pro вместо 14.', button: 'Скопировать код и открыть App Store', copied: 'Код скопирован' }
+      };
+      T = T[lang] || (lang === 'hr' || lang === 'bs' || lang === 'me' ? T.sr : T.en);
+      document.querySelector('.center-card h1').textContent = T.title;
+      document.querySelector('.center-card h1 + p').textContent = T.sub;
+      document.documentElement.lang = T.title === 'Get ExpiryPal' ? 'en' : (lang === 'ru' ? 'ru' : 'sr');
+
+      function copyText(text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          return navigator.clipboard.writeText(text).catch(function () { legacyCopy(text); });
+        }
+        legacyCopy(text);
+        return Promise.resolve();
+      }
+      function legacyCopy(text) {
+        var input = document.createElement('input');
+        input.value = text;
+        input.setAttribute('readonly', '');
+        input.style.position = 'fixed';
+        input.style.opacity = '0';
+        document.body.appendChild(input);
+        input.select();
+        input.setSelectionRange(0, text.length);
+        try { document.execCommand('copy'); } catch (err) {}
+        document.body.removeChild(input);
+      }
+      // Copies inside the tap, then opens the store. Never waits more than a moment on the clipboard.
+      function copyThenGo(e, text, url) {
+        e.preventDefault();
+        var go = document.getElementById('copy-go');
+        var left = false;
+        function leave() { if (!left) { left = true; window.location.href = url; } }
+        copyText(text).then(function () {
+          if (go) go.textContent = T.copied + ' \u2713';
+          setTimeout(leave, 350);
+        });
+        setTimeout(leave, 1200);
       }
 
       var done = false;
