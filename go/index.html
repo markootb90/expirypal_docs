@@ -15,8 +15,14 @@
   <link rel="preload" href="/assets/fonts/PlusJakartaSans-ExtraBold.woff" as="font" type="font/woff" crossorigin>
   <link rel="stylesheet" href="/assets/site.css?v=7">
   <meta name="robots" content="noindex">
+  <style>
+    .code-row { display: inline-flex; align-items: center; gap: 12px; }
+    .copy-btn { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px 0 11px; border: 0; border-radius: 999px; background: var(--brand); color: var(--on-brand); font: inherit; font-size: 14px; font-weight: 700; letter-spacing: 0; cursor: pointer; }
+    .copy-btn svg { width: 16px; height: 16px; }
+    .copy-btn.done { background: var(--brand-ink); }
+  </style>
 </head>
-<body><header class="top"><div class="wrap"><a class="brand" href="/"><img src="/assets/icon-green.png" alt="">ExpiryPal</a><nav class="nav"><a href="/#how">How it works</a><a href="/#pricing">Pricing</a><a href="/#get">Support</a></nav><a class="btn sm" href="/#get">Get the app</a></div></header><main class="page"><div class="doc center-card"><img class="logo" src="/assets/icon-green.png" alt=""><h1>Get ExpiryPal</h1><p>Waste less. Save more. ExpiryPal reminds you before things run out.</p><p id="code-line" class="codebox" hidden><span id="code-label">Your promo code</span><b id="code"></b><span id="code-hint">Paste it when you first open ExpiryPal and get 30 days of Pro instead of 14.</span></p><p id="copy-wrap" hidden><a class="btn" id="copy-go" href="https://apps.apple.com/app/id6821722011">Copy code and open App Store</a></p><div class="stores"><a class="sbadge" id="app-store" href="https://apps.apple.com/app/id6821722011"><img src="/assets/badge-app-store.svg" alt="Download on the App Store" width="168" height="56"></a><a class="sbadge" id="play-store" href="https://play.google.com/store/apps/details?id=com.expirypal.app"><img src="/assets/badge-google-play.png" alt="Get it on Google Play" width="188" height="56"></a></div></div></main><footer><div class="wrap"><span>© 2026 ExpiryPal</span><div class="links"><a href="/privacy.html">Privacy</a><a href="mailto:expirypal.app@gmail.com">Contact</a></div></div></footer>
+<body><header class="top"><div class="wrap"><a class="brand" href="/"><img src="/assets/icon-green.png" alt="">ExpiryPal</a><nav class="nav"><a href="/#how">How it works</a><a href="/#pricing">Pricing</a><a href="/#get">Support</a></nav><a class="btn sm" href="/#get">Get the app</a></div></header><main class="page"><div class="doc center-card"><img class="logo" src="/assets/icon-green.png" alt=""><h1>Get ExpiryPal</h1><p>Waste less. Save more. ExpiryPal reminds you before things run out.</p><p id="code-line" class="codebox" hidden><span id="code-label">Your promo code</span><span class="code-row"><b id="code"></b><button type="button" class="copy-btn" id="copy-code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span id="copy-label">Copy</span></button></span><span id="code-hint">Paste it when you first open ExpiryPal and get 30 days of Pro instead of 14.</span></p><p id="copy-wrap" hidden><a class="btn" id="copy-go" href="https://apps.apple.com/app/id6821722011">Copy code and open App Store</a></p><div class="stores"><a class="sbadge" id="app-store" href="https://apps.apple.com/app/id6821722011"><img src="/assets/badge-app-store.svg" alt="Download on the App Store" width="168" height="56"></a><a class="sbadge" id="play-store" href="https://play.google.com/store/apps/details?id=com.expirypal.app"><img src="/assets/badge-google-play.png" alt="Get it on Google Play" width="188" height="56"></a></div></div></main><footer><div class="wrap"><span>© 2026 ExpiryPal</span><div class="links"><a href="/privacy.html">Privacy</a><a href="mailto:expirypal.app@gmail.com">Contact</a></div></div></footer>
   <script>
     (function () {
       // App Store Connect > App Analytics > Campaigns > Generate a campaign link shows the provider token ("pt").
@@ -62,6 +68,17 @@
           document.getElementById('code-label').textContent = T.label;
           document.getElementById('code-hint').textContent = T.hint;
           document.getElementById('code-line').hidden = false;
+          var copyBtn = document.getElementById('copy-code');
+          var copyLabel = document.getElementById('copy-label');
+          copyLabel.textContent = T.copy;
+          copyBtn.setAttribute('aria-label', T.copy + ' ' + code);
+          copyBtn.addEventListener('click', function () {
+            copyText(code).then(function () {
+              copyLabel.textContent = T.done + ' \u2713';
+              copyBtn.classList.add('done');
+              setTimeout(function () { copyLabel.textContent = T.copy; copyBtn.classList.remove('done'); }, 2000);
+            });
+          });
           // Any store tap copies the code, so the app can offer "Paste" on first launch.
           document.getElementById('app-store').addEventListener('click', function (e) { copyThenGo(e, code, ios); });
           document.getElementById('play-store').addEventListener('click', function (e) { copyThenGo(e, code, android); });
@@ -84,9 +101,9 @@
 
       var lang = (navigator.language || 'en').slice(0, 2).toLowerCase();
       var T = {
-        en: { title: 'Get ExpiryPal', sub: 'Waste less. Save more. ExpiryPal reminds you before things run out.', label: 'Your promo code', hint: 'Paste it when you first open ExpiryPal and get 30 days of Pro instead of 14.', button: 'Copy code and open App Store', copied: 'Code copied' },
-        sr: { title: 'Preuzmi ExpiryPal', sub: 'Manje bacaj. Više uštedi. ExpiryPal te podseti pre nego što nešto istekne.', label: 'Tvoj promo kod', hint: 'Nalepi ga kad prvi put otvoriš ExpiryPal i dobij 30 dana Pro-a umesto 14.', button: 'Kopiraj kod i otvori App Store', copied: 'Kod je kopiran' },
-        ru: { title: 'Скачать ExpiryPal', sub: 'Меньше выбрасывай. Больше экономь. ExpiryPal напомнит, пока срок не истёк.', label: 'Ваш промокод', hint: 'Вставьте его при первом запуске ExpiryPal и получите 30 дней Pro вместо 14.', button: 'Скопировать код и открыть App Store', copied: 'Код скопирован' }
+        en: { title: 'Get ExpiryPal', sub: 'Waste less. Save more. ExpiryPal reminds you before things run out.', label: 'Your promo code', hint: 'Paste it when you first open ExpiryPal and get 30 days of Pro instead of 14.', button: 'Copy code and open App Store', copied: 'Code copied', copy: 'Copy', done: 'Copied' },
+        sr: { title: 'Preuzmi ExpiryPal', sub: 'Manje bacaj. Više uštedi. ExpiryPal te podseti pre nego što nešto istekne.', label: 'Tvoj promo kod', hint: 'Nalepi ga kad prvi put otvoriš ExpiryPal i dobij 30 dana Pro-a umesto 14.', button: 'Kopiraj kod i otvori App Store', copied: 'Kod je kopiran', copy: 'Kopiraj', done: 'Kopirano' },
+        ru: { title: 'Скачать ExpiryPal', sub: 'Меньше выбрасывай. Больше экономь. ExpiryPal напомнит, пока срок не истёк.', label: 'Ваш промокод', hint: 'Вставьте его при первом запуске ExpiryPal и получите 30 дней Pro вместо 14.', button: 'Скопировать код и открыть App Store', copied: 'Код скопирован', copy: 'Копировать', done: 'Скопировано' }
       };
       T = T[lang] || (lang === 'hr' || lang === 'bs' || lang === 'me' ? T.sr : T.en);
       document.querySelector('.center-card h1').textContent = T.title;
