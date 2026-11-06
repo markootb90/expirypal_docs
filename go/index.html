@@ -29,6 +29,8 @@
       var PROVIDER_TOKEN = '129595375';
       var APP_STORE_ID = '6821722011';
       var PLAY_PACKAGE = 'com.expirypal.app';
+      // Cookieless link counts per creator. The site code must be registered at goatcounter.com.
+      var GOATCOUNTER = 'https://expirypal.goatcounter.com/count';
 
       var params = new URLSearchParams(window.location.search);
       // Apple allows up to 40 characters in a campaign token.
@@ -60,12 +62,21 @@
         return 'https://apps.apple.com/redeem?ctx=offercodes&id=' + APP_STORE_ID + '&code=' + encodeURIComponent(code);
       }
 
-      function playRedeem(code) {
-        return 'https://play.google.com/redeem?code=' + encodeURIComponent(code);
+      // sendBeacon survives the redirect that follows straight after.
+      function countVisit(campaign) {
+        if (!GOATCOUNTER || !campaign) return;
+        var url = GOATCOUNTER + '?p=' + encodeURIComponent('/go/' + campaign) +
+          '&t=' + encodeURIComponent(campaign) + '&rnd=' + Math.random().toString(36).slice(2);
+        try {
+          if (!(navigator.sendBeacon && navigator.sendBeacon(url))) {
+            new Image().src = url;
+          }
+        } catch (err) {}
       }
 
       function show(creator) {
         var campaign = creator ? creator.slug : '';
+        countVisit(campaign);
         var ios = appStoreUrl(campaign);
         var android = playStoreUrl(campaign);
         document.getElementById('app-store').href = ios;
@@ -73,21 +84,27 @@
         if (creator && creator.code) {
           var code = creator.code;
           var iosRedeem = appleRedeem(code);
-          var androidRedeem = playRedeem(code);
+          // Play custom codes are only accepted in the app's checkout, so Android goes to the listing. Its
+          // referrer is what credits the creator.
           document.getElementById('app-store').href = iosRedeem;
-          document.getElementById('play-store').href = androidRedeem;
           if (isIOS) {
             window.location.replace(iosRedeem);
             return;
           }
-          if (isAndroid) {
-            window.location.replace(androidRedeem);
-            return;
-          }
           document.getElementById('code').textContent = code;
           document.getElementById('code-label').textContent = T.label;
-          document.getElementById('code-hint').textContent = T.hint;
+          document.getElementById('code-hint').textContent = isAndroid ? T.hint + ' ' + T.playHint : T.hint;
           document.getElementById('code-line').hidden = false;
+          if (isAndroid) {
+            var go = document.getElementById('copy-go');
+            go.textContent = T.playGo;
+            go.href = android;
+            go.addEventListener('click', function (event) {
+              event.preventDefault();
+              copyText(code).then(function () { window.location.href = android; });
+            });
+            document.getElementById('copy-wrap').hidden = false;
+          }
           var copyBtn = document.getElementById('copy-code');
           var copyLabel = document.getElementById('copy-label');
           copyLabel.textContent = T.copy;
@@ -110,9 +127,9 @@
 
       var lang = (navigator.language || 'en').slice(0, 2).toLowerCase();
       var T = {
-        en: { title: 'Get ExpiryPal', sub: 'Know before it expires. ExpiryPal reminds you before things run out.', label: 'Your offer code', hint: 'The first month of Monthly is free. The monthly price starts afterwards unless you cancel.', button: 'Redeem offer code', copied: 'Code copied', copy: 'Copy', done: 'Copied' },
-        sr: { title: 'Preuzmi ExpiryPal', sub: 'Saznaj pre nego što istekne. ExpiryPal te podseti na vreme.', label: 'Tvoj kod ponude', hint: 'Prvi mesec Monthly plana je besplatan. Onda počinje mesečna cena, osim ako ne otkažeš.', button: 'Iskoristi kod ponude', copied: 'Kod je kopiran', copy: 'Kopiraj', done: 'Kopirano' },
-        ru: { title: 'Скачать ExpiryPal', sub: 'Узнай, пока не истекло. ExpiryPal напомнит вовремя.', label: 'Ваш код предложения', hint: 'Первый месяц месячной подписки бесплатный. Затем начнётся помесячная оплата, если не отменить.', button: 'Активировать код предложения', copied: 'Код скопирован', copy: 'Копировать', done: 'Скопировано' }
+        en: { title: 'Get ExpiryPal', sub: 'Know before it expires. ExpiryPal reminds you before things run out.', label: 'Your offer code', hint: 'The first month of Monthly is free. The monthly price starts afterwards unless you cancel.', button: 'Redeem offer code', copied: 'Code copied', copy: 'Copy', done: 'Copied', playGo: 'Copy code and open Google Play', playHint: 'On Android: install ExpiryPal, choose Monthly, then in Google Play checkout tap the arrow next to the payment method, tap Redeem and paste the code.' },
+        sr: { title: 'Preuzmi ExpiryPal', sub: 'Saznaj pre nego što istekne. ExpiryPal te podseti na vreme.', label: 'Tvoj kod ponude', hint: 'Prvi mesec Monthly plana je besplatan. Onda počinje mesečna cena, osim ako ne otkažeš.', button: 'Iskoristi kod ponude', copied: 'Kod je kopiran', copy: 'Kopiraj', done: 'Kopirano', playGo: 'Kopiraj kod i otvori Google Play', playHint: 'Na Androidu: instaliraj ExpiryPal, izaberi Monthly, pa u Google Play plaćanju dodirni strelicu pored načina plaćanja, dodirni Iskoristi i nalepi kod.' },
+        ru: { title: 'Скачать ExpiryPal', sub: 'Узнай, пока не истекло. ExpiryPal напомнит вовремя.', label: 'Ваш код предложения', hint: 'Первый месяц месячной подписки бесплатный. Затем начнётся помесячная оплата, если не отменить.', button: 'Активировать код предложения', copied: 'Код скопирован', copy: 'Копировать', done: 'Скопировано', playGo: 'Скопировать код и открыть Google Play', playHint: 'На Android: установите ExpiryPal, выберите месячную подписку, затем при оплате в Google Play нажмите стрелку рядом со способом оплаты, нажмите «Активировать» и вставьте код.' }
       };
       T = T[lang] || (lang === 'hr' || lang === 'bs' || lang === 'me' ? T.sr : T.en);
       document.querySelector('.center-card h1').textContent = T.title;
